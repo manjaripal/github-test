@@ -1,0 +1,234 @@
+SalesDataTable.js
+
+import { LightningElement, wire, api } from 'lwc';
+import getData from '@salesforce/apex/SalesDataTable.getData';
+import getLastYearData from '@salesforce/apex/SalesDataTable.getLastYearData';
+import getLastYearTodateData from '@salesforce/apex/SalesDataTable.getLastYearTodateData';
+import getLastToLastYearData from '@salesforce/apex/SalesDataTable.getLastToLastYearData';
+import getProdID from '@salesforce/apex/SalesDataTable.getProdID';
+
+export default class SalesDataTable extends LightningElement {
+   
+    data = [];
+    currentYearData = [];
+    lastYearData = [];
+    lastToLastYearData = [];
+    productId =[];
+    @api recordId;
+
+    pageSize = 10;
+    currentPage = 1;
+    totalPages = 0;
+    disablePrevious = true;
+    disableNext = false;
+
+  
+@wire(getData, {recId: '$recordId'})
+wiredData({error, data}) {
+    if (data) {           
+        console.log('wiredData', data);
+        this.currentYearData = data;        
+    } else if (error) {
+        console.log(error);
+    }
+}
+
+@wire(getLastYearData, {duprecId: '$recordId'})
+wiredLastYearData({error, data}) {
+    if (data) {
+        console.log('wiredLastYearData', data);        
+    //  Store the last year data for processData()
+        this.lastYearData = data;
+    } else if (error) {
+        console.log(error);
+    }
+}
+
+/*@wire(getLastYearTodateData,{duprecIdltd: '$recordId'})
+wiredLastYearToDateData({error, data}) {
+    if (data) {
+        console.log('wiredLastYearToDateData', data);        
+    //  Store the last year to date data for processData()
+        this.lastYearToDateData = data;
+    } else if (error) {
+        console.log(error);
+    }
+}*/
+
+@wire(getLastYearTodateData, {duprecIdltd: '$recordId'})
+wiredLastYearTodateData({error, data}) {
+    if (data) {
+        console.log('wiredLastYearTodateData', data);        
+    //  Store the last year data for processData()
+        this.lastYearTodateData = data;
+    } else if (error) {
+        console.log(error);
+    }
+}
+
+
+@wire(getLastToLastYearData, {recIdforlly: '$recordId'})
+wiredLastToLastYearData({error, data}) {
+    if (data) {
+        console.log('wiredLastToLastYearData', data);
+        this.lastToLastYearData = data;         
+        console.log('This is for testing wiredLastToLastYearData');   
+    } else if (error) {
+        console.log(error);
+    }
+}
+
+@wire(getProdID, {recProId: '$recordId'})
+wiredProdID({error,data}) {
+  if (data) {
+    console.log('wiredProductID', data);
+    this.productId = data;         
+    console.log('This is for testing wiredProductID');  
+    this.processData(this.productId, this.currentYearData, this.lastYearData,this.lastYearTodateData, this.lastToLastYearData);
+} else if (error) {
+    console.log(error);
+}
+}
+
+processData(productId,currentYearData, lastYearData, lastYearTodateData, lastToLastYearData) {
+    // Merge the data from both wire adapters into a single array
+    console.log('Inside ProcessData');  
+     // this.data = currentYearData.map(currentYearItem => {
+        this.data = productId.map(productItem => {
+            const currentYearItem = currentYearData ? currentYearData.find(currentYearItem => currentYearItem.Product__c === productItem.Product__c) : 0;
+        const lastYearItem = lastYearData ? lastYearData.find(lastYearItem => lastYearItem.Product__c === productItem.Product__c) : 0;
+        const lastYearTodateItem = lastYearTodateData ? lastYearTodateData.find(lastYearTodateItem => lastYearTodateItem.Product__c === productItem.Product__c) : 0;
+        const lastToLastYearItem = lastToLastYearData ? lastToLastYearData.find(lastToLastYearItem => lastToLastYearItem.Product__c === productItem.Product__c) : 0;
+      
+        if (currentYearItem && typeof currentYearItem.Quantity__c === 'number') {
+            const currentYearQuantity = currentYearItem.Quantity__c.toFixed(0);
+        } else {
+            const currentYearQuantity = 0; // Set a default value or handle the case where Quantity__c is not a number
+        }
+       // const currentYearQuantity = currentYearItem && typeof currentYearItem.Quantity__c === 'number' ? currentYearItem.Quantity__c.toFixed(0) : 0;
+        const lasttoLastYearQuantity = lastToLastYearItem && typeof lastToLastYearItem.Quantity__c === 'number' ? lastToLastYearItem.Quantity__c.toFixed(0) : 0;
+        const currentYearAmount = currentYearItem ? currentYearItem.Total_Product_Price__c : 0;   
+        const lastYearTodateAmount = lastYearTodateItem ? lastYearTodateItem.Total_Product_Price__c :0;
+        
+        // Calculate amtDifference here
+        const amtDifference = ((typeof lastYearTodateItem?.Total_Product_Price__c === 'number' && typeof currentYearAmount === 'number') ?
+        (currentYearAmount - lastYearTodateItem.Total_Product_Price__c) :
+        ((typeof currentYearAmount === 'number') ? currentYearAmount : 0));
+    
+        const amtDifferenceWithCommaAndRounded = (amtDifference !== 0) ? amtDifference.toLocaleString(undefined, { maximumFractionDigits: 0 }) : 0;
+
+
+        // Calculate amtDifferencePercentage here)        
+        const amtDifferencePercentage = lastYearTodateAmount !== 0 ? ((((typeof lastYearTodateItem?.Total_Product_Price__c === 'number' &&
+        typeof currentYearAmount === 'number') ? (currentYearAmount - lastYearTodateItem.Total_Product_Price__c) :
+        ((typeof currentYearAmount === 'number') ? currentYearAmount : 0)) / lastYearTodateAmount) * 100) : 0; 
+    
+
+             
+
+        return {                       
+           
+            productName: productItem.Invoice_Product_Name__c,
+            lasttoLastYearQuantity: lastToLastYearItem ? lastToLastYearItem.Quantity__c : 0, 
+            lastYearToDateQuantity: lastYearTodateItem ? lastYearTodateItem.Quantity__c : 0,
+           // lastYearToDateTotalPrice : lastYearTodateItem ? lastYearTodateItem.Total_Product_Price__c : 0 ,
+            lastYearQuantity: lastYearItem ? lastYearItem.Quantity__c : 0,            
+            qtyUnitsLastYear: lastYearItem ? lastYearItem.Quantity_Units__c : null,
+            lastYearAmount: lastYearItem && typeof lastYearItem.Total_Product_Price__c === 'number' ? Number(lastYearItem.Total_Product_Price__c) : 0,           
+           //lastYearTodateAmount : lastYearTodateItem && typeof lastYearTodateItem.Total_Product_Price__c === 'number' ? Number(lastYearTodateItem.Total_Product_Price__c.toFixed(0)): null,
+           lastYearTodateAmount : lastYearTodateItem && typeof lastYearTodateItem.Total_Product_Price__c === 'number' ? (Number(lastYearTodateItem.Total_Product_Price__c)).toLocaleString(): 0,
+           qtyUnitsLastYearTodate : lastYearTodateItem ? lastYearTodateItem.Quantity_Units__c : 0,
+           currentYearQuantity: currentYearItem ? currentYearItem.Quantity__c: 0 ,         
+           
+            qtyUnitsCurrentYear: currentYearItem ? currentYearItem.Quantity_Units__c : null,
+           // currentYearAmount: currentYearItem && typeof currentYearItem.Total_Product_Price__c === 'number' ? Number(currentYearItem.Total_Product_Price__c.toFixed(0)) : null, 
+            currentYearAmount: currentYearItem && typeof currentYearItem.Total_Product_Price__c === 'number' ? currentYearItem.Total_Product_Price__c.toLocaleString()  : 0,
+            qtyDifference: (typeof lastYearTodateItem?.Quantity__c === 'number' ? (typeof currentYearItem?.Quantity__c === 'number' ? Number((currentYearItem.Quantity__c - lastYearTodateItem.Quantity__c).toFixed(0)) : (0 - lastYearTodateItem.Quantity__c)) : (typeof currentYearItem?.Quantity__c === 'number' ? currentYearItem.Quantity__c:0)),
+          
+          // amtDifference: (typeof lastYearTodateItem?.Total_Product_Price__c === 'number' ? (typeof currentYearItem?.Total_Product_Price__c === 'number' ? Number((currentYearItem.Total_Product_Price__c - lastYearTodateItem.Total_Product_Price__c).toFixed(0)) : (0 - lastYearTodateItem.Total_Product_Price__c)) : (typeof currentYearItem?.Total_Product_Price__c === 'number' ? currentYearItem.Total_Product_Price__c:null)),
+                      
+           amtDifference: amtDifferenceWithCommaAndRounded,
+           amtDifferencePercentage: amtDifferencePercentage,
+          
+        };
+    }); 
+    this.totalPages = Math.ceil(this.data.length / this.pageSize);
+  }
+
+
+  
+get totalPages() {
+    const totalpages = Math.ceil(this.data.length / this.pageSize);
+    console.log('total pages', totalpages);
+    return totalpages;
+} 
+
+get pagedData() {
+    const start = (this.currentPage - 1) * this.pageSize;
+    const end = start + this.pageSize;
+    console.log('pagedData get call');
+    return this.data.slice(start, end).map((item, index) => {
+        const sNo = start + index + 1;
+        return { ...item, sNo };
+    });      
+}
+
+previousPage() {
+    if (this.currentPage > 1) {
+        this.currentPage--;
+        this.disablePrevious = this.currentPage === 1;
+        this.disableNext = false;
+        console.log('previousPage get call ');
+    }
+}
+
+nextPage() {
+    if (this.currentPage < this.totalPages) {
+        this.currentPage++;
+        this.disablePrevious = false;
+        this.disableNext = this.currentPage === this.totalPages;
+        this.startingIndex = (this.currentPage - 1) * this.pageSize;
+        console.log('nextPage get call');
+    }
+}
+
+/*handlePreviousClick() {
+    this.previousPage();
+}
+handleNextClick() {
+    this.nextPage();
+}*/
+
+handlePreviousClick() {
+    this.previousPage();
+    this.disableFirstPage = this.currentPage === 1;
+    this.disableLastPage = false;
+}
+
+handleNextClick() {
+    this.nextPage();
+    this.disableFirstPage = false;
+    this.disableLastPage = this.currentPage === this.totalPages;
+}
+// New properties for disabling First Page and Last Page buttons
+disableFirstPage = true;
+disableLastPage = false;
+
+// Existing methods...
+
+handleFirstPageClick() {
+    this.currentPage = 1;
+    this.disablePrevious = true;
+    this.disableNext = false;
+}
+
+handleLastPageClick() {
+    this.currentPage = this.totalPages;
+    this.disablePrevious = false;
+    this.disableNext = true;
+}
+
+}
+
+
+

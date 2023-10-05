@@ -1,0 +1,280 @@
+public class SalesDataTable {     
+    
+	@AuraEnabled(cacheable=true)
+
+	public static List<Invoice_Lines__c> getData(Id recId) {       
+	List<Invoice_Lines__c> resultTable = new List<Invoice_Lines__c>();           
+	List<AggregateResult> dTable = [SELECT Product__c pId, Product__r.Name pName,  Quantity_Units__c pUnits, SUM(Quantity__c) totalQty, SUM(Total_Price__c) totalPrice FROM Invoice_Lines__c 
+										WHERE Account__c =: recId AND Invoice_Date__c  = THIS_YEAR AND 
+										Product__c != null GROUP BY Product__c, Product__r.Name, Quantity_Units__c 
+										  ORDER BY Product__r.Name ASC];   
+								//		system.debug('dtable value' + dTable);        
+								//		system.debug('Record Id value' + recId);  
+	List<AggregateResult> dgrandTable = [SELECT  SUM(Quantity__c) grtotalQty, SUM(Total_Price__c) grtotalPrice FROM Invoice_Lines__c 
+										WHERE Account__c =: recId AND Invoice_Date__c  = THIS_YEAR AND 
+										Product__c != null ];  
+		system.debug('GrandTable value' + dgrandTable);    
+   //  Decimal quantity = 0;
+		if (dTable != null && !dTable.isEmpty()) {
+				   for ( AggregateResult invl : dTable)  { 
+
+				 Invoice_Lines__c item = new Invoice_Lines__c();                 
+				item.Product__c = String.valueOf(invl.get('pId'));
+				item.Invoice_Product_Name__c = String.valueOf(invl.get('pName'));
+				item.Quantity_Units__c = String.valueOf(invl.get('pUnits')); 
+				//item.Quantity__c = (Decimal)invl.get('totalQty');
+				//item.Total_Product_Price__c = (Decimal)invl.get('totalPrice');
+
+				item.Quantity__c =  Integer.valueOf(invl.get('totalQty'));				
+			    item.Total_Product_Price__c = Integer.valueOf(invl.get('totalPrice'));     
+			  
+			//	system.debug('Product ID is '+ item.Product__c +'and Product Name is '+ item.Invoice_Product_Name__c );
+				resultTable.add(item);
+			//S	system.debug('resultTable value' + resultTable);  
+		}
+		}
+		 if (dgrandTable != null && !dgrandTable.isEmpty()) {
+			Invoice_Lines__c item1 = new Invoice_Lines__c();  
+			//item1.Product__c = '01tDD00000HQe2VYAT';
+			//item1.Invoice_Product_Name__c = 'Grand Total';
+             // Production Grand Total 
+            item1.Product__c = '01tHs000008vbw4IAA';
+		    item1.Invoice_Product_Name__c = 'Grand Total';
+             
+			//item1.Quantity_Units__c = String.valueOf(dgrandTable[0].get('pUnits'));
+						 
+			item1.Total_Product_Price__c = Integer.valueOf(dgrandTable[0].get('grtotalPrice'));
+			item1.Quantity__c = Integer.valueOf(dgrandTable[0].get('grtotalQty'));	
+						   system.debug('Product ID is '+ item1.Product__c +'and Product Name is '+ item1.Invoice_Product_Name__c );
+						   system.debug('Quantity__c is '+ item1.Quantity__c +'and Total_Product_Price__c is '+ item1.Total_Product_Price__c );
+						   resultTable.add(item1);
+						   system.debug('resultTable value ' + resultTable);  		   
+	   }
+		 return resultTable;
+		}
+	
+@AuraEnabled(cacheable=true)
+	public static List<Invoice_Lines__c> getLastYearData(Id duprecId) {
+		 List<Invoice_Lines__c> resultTable = new List<Invoice_Lines__c>();           
+		List<AggregateResult> dTable = [SELECT  Product__c pId, Product__r.Name pName,  Quantity_Units__c pUnits, SUM( Quantity__c) totalQty, SUM(Total_Price__c) totalPrice FROM Invoice_Lines__c 
+										WHERE Account__c =: duprecId AND Invoice_Date__c  = LAST_YEAR AND 
+										Product__c != null GROUP BY Product__c, Product__r.Name, Quantity_Units__c 
+										  ORDER BY Product__r.Name ASC];  
+		
+	  system.debug('Record Id value' + duprecId); 
+		  List<AggregateResult> dgrandTable = [SELECT  SUM(Quantity__c) grtotalQty, SUM(Total_Price__c) grtotalPrice FROM Invoice_Lines__c 
+										WHERE Account__c =: duprecId AND Invoice_Date__c  = LAST_YEAR AND 
+										Product__c != null ];  
+		system.debug('GrandTable value Last Year' + dgrandTable);    
+		
+		if (dTable != null && !dTable.isEmpty()) {
+				   for ( AggregateResult invl : dTable)  { 
+
+				 Invoice_Lines__c item = new Invoice_Lines__c();                 
+				item.Product__c = String.valueOf(invl.get('pId'));
+				item.Invoice_Product_Name__c = String.valueOf(invl.get('pName'));
+				item.Quantity_Units__c = String.valueOf(invl.get('pUnits'));  
+				//item.Quantity__c = (Decimal)invl.get('totalQty');
+				//item.Total_Product_Price__c = (Decimal)invl.get('totalPrice'); 
+				item.Quantity__c =  Integer.valueOf(invl.get('totalQty'));				
+			    item.Total_Product_Price__c = Integer.valueOf(invl.get('totalPrice'));     
+				system.debug('Product ID is '+ item.Product__c +'and Product Name is '+ item.Invoice_Product_Name__c );
+				resultTable.add(item);
+		}
+		}
+		if (dgrandTable != null && !dgrandTable.isEmpty()) {
+			Invoice_Lines__c item1 = new Invoice_Lines__c();  
+			//item1.Product__c = '01tDD00000HQe2VYAT';
+			//item1.Invoice_Product_Name__c = 'Grand Total';
+            // Production Grand Total
+              item1.Product__c = '01tHs000008vbw4IAA';
+		      item1.Invoice_Product_Name__c = 'Grand Total';
+						  // item.Quantity_Units__c = String.valueOf(dgrandTable[0].get('pUnits')); 
+						  item1.Total_Product_Price__c = Integer.valueOf(dgrandTable[0].get('grtotalPrice'));
+						  item1.Quantity__c = Integer.valueOf(dgrandTable[0].get('grtotalQty'));	
+						   system.debug('Product ID is '+ item1.Product__c +'and Product Name is '+ item1.Invoice_Product_Name__c );
+						   system.debug('Quantity__c is '+ item1.Quantity__c +'and Total_Product_Price__c is '+ item1.Total_Product_Price__c );
+						   resultTable.add(item1);
+						   system.debug('resultTable value Last Year' + resultTable);  		   
+	   }
+		 return resultTable;
+	}
+/*
+	@AuraEnabled(cacheable=true)
+	public static List<Invoice_Lines__c> getLastYearToDateData(Id duprecId) {
+		 List<Invoice_Lines__c> resultTable = new List<Invoice_Lines__c>();   
+		 // Calculate the dynamic date range
+		Date today = Date.today();
+		Date lastYearStartDate = Date.newInstance(today.year() - 1, 1, 1);
+		Date lastYearEndDate = Date.newInstance(today.year() - 1, today.month(), today.day());
+
+		// Construct the dynamic SOQL query
+		String query = 'SELECT Product__c pId, Product__r.Name pName, Quantity_Units__c pUnits, SUM(Quantity__c) totalQty, SUM(Total_Price__c) totalPrice ' +
+					'FROM Invoice_Lines__c ' +
+					'WHERE Account__c = : duprecId AND Invoice_Date__c >= :lastYearStartDate AND Invoice_Date__c <= :lastYearEndDate AND Product__c != null ' +
+					'GROUP BY Product__c, Product__r.Name, Quantity_Units__c ' +
+					'ORDER BY Product__c ASC';
+
+		// Execute the query
+		List<AggregateResult> dTable = Database.query(query);
+
+		// Now, you can loop through the results and access the aggregated data
+		//for (AggregateResult result : results) {
+		//	String productId = (String)result.get('pId');
+		//	String productName = (String)result.get('pName');
+		//	Decimal totalQuantity = (Decimal)result.get('totalQty');
+		//	Decimal totalPrice = (Decimal)result.get('totalPrice');
+			// ... do something with the data
+		//}
+	  
+		if (dTable != null && !dTable.isEmpty()) {
+				   for ( AggregateResult invl : dTable)  { 
+
+				 Invoice_Lines__c item = new Invoice_Lines__c();                 
+				item.Product__c = String.valueOf(invl.get('pId'));
+				item.Invoice_Product_Name__c = String.valueOf(invl.get('pName'));
+				item.Quantity_Units__c = String.valueOf(invl.get('pUnits'));  
+				item.Quantity__c = (Decimal)invl.get('totalQty');
+				item.Total_Product_Price__c = (Decimal)invl.get('totalPrice'); 
+				system.debug('Product ID is '+ item.Product__c +'and Product Name is '+ item.Invoice_Product_Name__c );
+				resultTable.add(item);
+		}
+		}
+		 return resultTable;
+	}
+	*/
+
+	 @AuraEnabled(cacheable=true)
+	 public static List<Invoice_Lines__c> getLastToLastYearData(Id recIdforlly) {
+	 List<Invoice_Lines__c> resultTable = new List<Invoice_Lines__c>();           
+	 List<AggregateResult> dTable = [SELECT  Product__c pId, Product__r.Name pName,  Quantity_Units__c pUnits, SUM(Quantity__c) totalQty, SUM(Total_Price__c) totalPrice FROM Invoice_Lines__c 
+										WHERE Account__c =: recIdforlly AND Invoice_Date__c  = N_YEARS_AGO:2 AND 
+										Product__c != null GROUP BY Product__c, Product__r.Name, Quantity_Units__c 
+										  ORDER BY Product__r.Name ASC];  
+		 
+	  List<AggregateResult> dgrandTable = [SELECT  SUM(Quantity__c) grtotalQty, SUM(Total_Price__c) grtotalPrice FROM Invoice_Lines__c 
+										WHERE Account__c =: recIdforlly AND Invoice_Date__c  = N_YEARS_AGO:2 AND 
+										Product__c != null ];  
+		system.debug('GrandTable value Last to Last Year' + dgrandTable);    									    
+	  
+		if (dTable != null && !dTable.isEmpty()) {
+				   for ( AggregateResult invl : dTable)  { 
+
+				 Invoice_Lines__c item = new Invoice_Lines__c();                 
+				item.Product__c = String.valueOf(invl.get('pId'));
+				item.Invoice_Product_Name__c = String.valueOf(invl.get('pName'));
+				item.Quantity_Units__c = String.valueOf(invl.get('pUnits'));  
+				//item.Quantity__c = (Decimal)invl.get('totalQty');
+				item.Quantity__c =  Integer.valueOf(invl.get('totalQty'));				
+			      
+				system.debug('Product ID is '+ item.Product__c +'and Product Name is '+ item.Invoice_Product_Name__c );
+				resultTable.add(item);
+		}
+		}
+		 
+		  if (dgrandTable != null && !dgrandTable.isEmpty()) {
+			Invoice_Lines__c item1 = new Invoice_Lines__c();  
+			//item1.Product__c = '01tDD00000HQe2VYAT';
+		  // item1.Invoice_Product_Name__c = 'Grand Total';
+              // Production Grand Total
+           item1.Product__c = '01tHs000008vbw4IAA';
+		   item1.Invoice_Product_Name__c = 'Grand Total';
+						  // item.Quantity_Units__c = String.valueOf(dgrandTable[0].get('pUnits')); 
+						  // item1.Quantity__c = (Decimal)dgrandTable[0].get('grtotalQty');						   
+						   item1.Total_Product_Price__c = Integer.valueOf(dgrandTable[0].get('grtotalPrice'));
+						   item1.Quantity__c = Integer.valueOf(dgrandTable[0].get('grtotalQty'));	
+						   system.debug('Product ID is '+ item1.Product__c +'and Product Name is '+ item1.Invoice_Product_Name__c );
+						   system.debug('Quantity__c is '+ item1.Quantity__c +'and Total_Product_Price__c is '+ item1.Total_Product_Price__c );
+						   resultTable.add(item1);
+			system.debug('resultTable value Last to Last Year' + resultTable);  		   
+	   }
+		 return resultTable;
+	 }   
+
+
+	// 08/25/23  
+		
+   @AuraEnabled(cacheable=true)        
+	public static List<Invoice_Lines__c> getLastYearTodateData(Id duprecIdltd) {
+			date myDate = System.Today().addYears(-1);
+			 List<Invoice_Lines__c> resultTable = new List<Invoice_Lines__c>();           
+			List<AggregateResult> dTable = [SELECT  Product__c pId, Product__r.Name pName,  Quantity_Units__c pUnits, SUM( Quantity__c) totalQty, SUM(Total_Price__c) totalPrice FROM Invoice_Lines__c 
+										WHERE Account__c =: duprecIdltd 
+													  AND (Invoice_Date__c  = LAST_YEAR AND Invoice_Date__c <=: myDate)
+													  AND Product__c != null GROUP BY Product__c, Product__r.Name, Quantity_Units__c 
+											 ORDER BY Product__r.Name ASC];            
+		List<AggregateResult> dgrandTable = [SELECT  SUM(Quantity__c) grtotalQty, SUM(Total_Price__c) grtotalPrice FROM Invoice_Lines__c 
+										WHERE Account__c =: duprecIdltd AND (Invoice_Date__c  = LAST_YEAR AND Invoice_Date__c <=: myDate) AND 
+										Product__c != null ];  
+		system.debug('GrandTable value Last Year to Date' + dgrandTable);    
+		
+		if (dTable != null && !dTable.isEmpty()) {
+				   for ( AggregateResult invl : dTable)  { 
+
+				 Invoice_Lines__c item = new Invoice_Lines__c();                 
+				item.Product__c = String.valueOf(invl.get('pId'));
+				item.Invoice_Product_Name__c = String.valueOf(invl.get('pName'));
+				item.Quantity_Units__c = String.valueOf(invl.get('pUnits'));  
+				//item.Quantity__c = (Decimal)invl.get('totalQty');
+				//item.Total_Product_Price__c = (Decimal)invl.get('totalPrice'); 
+				item.Quantity__c =  Integer.valueOf(invl.get('totalQty'));				
+			    item.Total_Product_Price__c = Integer.valueOf(invl.get('totalPrice'));     
+				system.debug('Product ID is '+ item.Product__c +'and Product Name is '+ item.Invoice_Product_Name__c );                       
+				resultTable.add(item);
+		}
+		}
+		
+		 if (dgrandTable != null && !dgrandTable.isEmpty()) {
+			Invoice_Lines__c item1 = new Invoice_Lines__c();  
+			//item1.Product__c = '01tDD00000HQe2VYAT';
+			//item1.Invoice_Product_Name__c = 'Grand Total';
+             
+             // Production Grand Total
+          item1.Product__c = '01tHs000008vbw4IAA';
+		  item1.Invoice_Product_Name__c = 'Grand Total';
+						  //item1.Quantity_Units__c = String.valueOf(dgrandTable[0].get('pUnits')); 
+						  item1.Total_Product_Price__c = Integer.valueOf(dgrandTable[0].get('grtotalPrice'));
+						  item1.Quantity__c = Integer.valueOf(dgrandTable[0].get('grtotalQty'));	
+						   system.debug('Product ID is '+ item1.Product__c +'and Product Name is '+ item1.Invoice_Product_Name__c );
+						   system.debug('Quantity__c is '+ item1.Quantity__c +'and Total_Product_Price__c is '+ item1.Total_Product_Price__c );
+						   resultTable.add(item1);
+		 system.debug('resultTable value Last Year To Date' + resultTable);  		   
+	   }
+		 return resultTable;
+	}  
+		
+		
+	@AuraEnabled(cacheable=true)
+	   public static List<Invoice_Lines__c> getProdID(Id recProId) {
+
+		
+	List<Invoice_Lines__c> resultTable = new List<Invoice_Lines__c>();                     
+	List<AggregateResult> pTable  = [SELECT  Product__c pId, Product__r.Name pName,  Quantity_Units__c pUnits FROM Invoice_Lines__c 
+										 WHERE Account__c =: recProId AND Invoice_Date__c  >= LAST_N_YEARS:2 AND Product__c != null 
+										 GROUP BY Product__c, Product__r.Name,Quantity_Units__c  
+										 ORDER BY Product__r.Name ASC];
+	   system.debug('Inside ProductID Method ' +pTable);
+	   System.debug('total values in pTable' +pTable.size()); 
+	for ( AggregateResult invl : pTable)  { 
+
+		 Invoice_Lines__c item = new Invoice_Lines__c();                 
+		item.Product__c = String.valueOf(invl.get('pId'));
+		item.Invoice_Product_Name__c = String.valueOf(invl.get('pName'));
+		item.Quantity_Units__c = String.valueOf(invl.get('pUnits'));        
+		system.debug('Product ID is '+ item.Product__c +'and Product Name is '+ item.Invoice_Product_Name__c );
+		resultTable.add(item);
+		
+		}	
+		Invoice_Lines__c item1 = new Invoice_Lines__c(); 
+            // SandBox Grand Total
+		//item1.Product__c = '01tDD00000HQe2VYAT';
+		//item1.Invoice_Product_Name__c = 'Grand Total';
+           // Production Grand Total
+         item1.Product__c = '01tHs000008vbw4IAA';
+		item1.Invoice_Product_Name__c = 'Grand Total';
+           
+		resultTable.add(item1);
+		 return resultTable;
+	}
+
+}

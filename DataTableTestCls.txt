@@ -1,0 +1,161 @@
+@isTest
+public class SalesDataTableTest {
+    
+    @testSetup
+    static void createTestData() {
+        // Create test account
+        Account testAccount = new Account(Name='Test Account', Type = 'Vendor', BillingCountry = 'United States', Region__c = 'North America');
+        insert testAccount;
+        
+        System.debug('testAccount values 1111' +testAccount);
+
+        // Create test Product items for current year
+       
+        Product2 testProduct1 = new Product2(Name = 'TestProduct 1', QuantityUnitOfMeasure='lb');
+        insert testProduct1;
+        Product2 testProduct2 = new Product2(Name = 'TestProduct 2',QuantityUnitOfMeasure='lb');
+        insert testProduct2;
+        Product2 testProduct3 = new Product2 (Name = 'TestProduct 3',QuantityUnitOfMeasure='kg');
+        insert testProduct3;
+        
+        // Create test invoice and invoiceLine items for current year
+
+        Invoice__c testInvoice1 = new Invoice__c(Account__c=testAccount.Id, Invoice_Date__c=Date.newInstance(2023, 4, 1));
+        insert testInvoice1;
+        System.debug('testInvoice1BBB' +testInvoice1.Id);
+        
+        Invoice_Lines__c testInvoiceLineItem1 = new Invoice_Lines__c(Account__c=testAccount.Id, Invoice__c = testInvoice1.Id, Product__c=testProduct1.Id, Quantity__c=10, Rate__c=1, Invoice_Product_Name__c = 'TestProduct 1', Quantity_Units__c = 'lb');
+        System.debug('testInvoiceLineItem1 values' +testInvoiceLineItem1);
+        insert testInvoiceLineItem1;
+        Invoice__c testInvoice2 = new Invoice__c(Account__c=testAccount.Id, Invoice_Date__c=Date.newInstance(2023, 4, 2));
+        insert testInvoice2;
+        Invoice_Lines__c testInvoiceLineItem2 = new Invoice_Lines__c(Account__c=testAccount.Id,Invoice__c=testInvoice2.Id, Product__c=testProduct2.Id, Quantity__c=5,  Rate__c=1, Invoice_Product_Name__c = 'TestProduct 2', Quantity_Units__c = 'lb');
+        insert testInvoiceLineItem2;
+        
+        Invoice__c testInvoice3 = new Invoice__c(Account__c=testAccount.Id, Invoice_Date__c=Date.newInstance(2023, 4, 3));
+        insert testInvoice3;
+        Invoice_Lines__c testInvoiceLineItem3 = new Invoice_Lines__c(Account__c=testAccount.Id,Invoice__c=testInvoice3.Id, Product__c=testProduct3.Id, Quantity__c=20, Rate__c=1, Invoice_Product_Name__c = 'TestProduct 3', Quantity_Units__c = 'kg');
+        insert testInvoiceLineItem3;
+               
+        
+        // Create test invoice line items for last year
+        Invoice__c testInvoiceLastYear1 = new Invoice__c(Account__c=testAccount.Id, Invoice_Date__c=Date.newInstance(2022, 4, 5));
+        insert testInvoiceLastYear1;
+        Invoice_Lines__c testLastYearInvoiceLineItem1 = new Invoice_Lines__c(Account__c=testAccount.Id,Invoice__c=testInvoiceLastYear1.Id, Product__c=testProduct1.Id, Quantity__c=352, Rate__c=85,Invoice_Product_Name__c = 'TestProduct 1', Quantity_Units__c = 'lb');
+        insert testLastYearInvoiceLineItem1;
+         System.debug('its in last year:' +testLastYearInvoiceLineItem1);
+        
+        Invoice__c testInvoiceLastYear2 = new Invoice__c(Account__c=testAccount.Id, Invoice_Date__c=Date.newInstance(2022, 8, 11));
+        insert testInvoiceLastYear2;
+        Invoice_Lines__c testLastYearInvoiceLineItem2 = new Invoice_Lines__c(Account__c=testAccount.Id,Invoice__c=testInvoiceLastYear2.Id, Product__c=testProduct1.Id, Quantity__c=705, Rate__c=8,Invoice_Product_Name__c ='TestProduct 1', Quantity_Units__c = 'lb');
+        insert testLastYearInvoiceLineItem2;
+        
+        Invoice__c testInvoiceLastYear3 = new Invoice__c(Account__c=testAccount.Id, Invoice_Date__c=Date.newInstance(2022, 5, 24));
+        insert testInvoiceLastYear3;
+        Invoice_Lines__c testLastYearInvoiceLineItem3 = new Invoice_Lines__c(Account__c=testAccount.Id,Invoice__c=testInvoiceLastYear3.Id, Product__c=testProduct2.Id, Quantity__c=705, Rate__c=8, Invoice_Product_Name__c = 'TestProduct 2', Quantity_Units__c = 'lb');
+        insert testLastYearInvoiceLineItem3;
+        
+        Invoice__c testInvoiceLastYear4 = new Invoice__c(Account__c=testAccount.Id, Invoice_Date__c=Date.newInstance(2022, 8, 29));
+        insert testInvoiceLastYear4;
+        Invoice_Lines__c testLastYearInvoiceLineItem4 = new Invoice_Lines__c(Account__c=testAccount.Id,Invoice__c=testInvoiceLastYear4.Id, Product__c=testProduct2.Id, Quantity__c=176, Rate__c=9, Invoice_Product_Name__c = 'TestProduct 2', Quantity_Units__c = 'lb');
+        insert testLastYearInvoiceLineItem4;
+        
+        Invoice__c testInvoiceLastYear5 = new Invoice__c(Account__c=testAccount.Id, Invoice_Date__c=Date.newInstance(2022, 8, 29));
+        insert testInvoiceLastYear5;
+        Invoice_Lines__c testLastYearInvoiceLineItem5 = new Invoice_Lines__c(Account__c=testAccount.Id,Invoice__c=testInvoiceLastYear5.Id, Product__c=testProduct2.Id, Quantity__c=485, Rate__c=9, Invoice_Product_Name__c = 'TestProduct 2', Quantity_Units__c = 'lb');
+        insert testLastYearInvoiceLineItem5;
+        
+        Invoice__c testInvoiceLastYear6 = new Invoice__c(Account__c=testAccount.Id, Invoice_Date__c=Date.newInstance(2022, 8, 31));
+        insert testInvoiceLastYear6;
+        Invoice_Lines__c testLastYearInvoiceLineItem6 = new Invoice_Lines__c(Account__c=testAccount.Id,Invoice__c=testInvoiceLastYear6.Id, Product__c=testProduct2.Id, Quantity__c=44, Rate__c=9, Invoice_Product_Name__c = 'TestProduct 2', Quantity_Units__c = 'lb');
+        insert testLastYearInvoiceLineItem6;
+        // Create test invoice line items for last to last year
+       
+        Invoice__c testInvoiceLasttoLastYear3 = new Invoice__c(Account__c=testAccount.Id, Invoice_Date__c=Date.newInstance(2021, 4, 8));
+        insert testInvoiceLasttoLastYear3;
+        Invoice_Lines__c testLastToLastYearInvoiceLineItem3 = new Invoice_Lines__c(Account__c=testAccount.Id,Invoice__c=testInvoiceLasttoLastYear3.Id, Product__c=testProduct3.Id, Quantity__c=5, Rate__c=1, Invoice_Product_Name__c = 'TestProduct 3', Quantity_Units__c = 'kg');
+        insert testLastToLastYearInvoiceLineItem3;      
+        }
+   
+        @isTest   
+        static void testGetData() {
+        Account testAccount = [SELECT Id FROM Account WHERE Name='Test Account' LIMIT 1];
+        System.debug('testAccount data' +testAccount);
+   
+        Test.startTest();
+        List<Invoice_Lines__c> result = SalesDataTable.getData(testAccount.Id);
+        System.debug('result data' +result.size());
+   
+        Test.stopTest();
+    
+        // Verify that the result list contains the expected records
+       System.assertEquals(4, result.size(), 'Incorrect result size');
+      
+        System.assertEquals(10, result[0].Quantity__c, 'Incorrect quantity in result');
+        System.assertEquals(10, result[0].Total_Product_Price__c, 'Incorrect total product price in result');
+        System.assertEquals('lb', result[0].Quantity_Units__c, 'Incorrect Unit in res');
+     
+        System.assertEquals(5, result[1].Quantity__c, 'Incorrect quantity in result');
+        System.assertEquals(5, result[1].Total_Product_Price__c, 'Incorrect total product price in result');
+        System.assertEquals('lb', result[1].Quantity_Units__c, 'Incorrect Unit in res');
+      
+        System.assertEquals(20, result[2].Quantity__c, 'Incorrect quantity in result');
+        System.assertEquals(20, result[2].Total_Product_Price__c, 'Incorrect total product price in result');
+        System.assertEquals('kg', result[2].Quantity_Units__c, 'Incorrect Unit in res'); 
+        
+    }     
+        @isTest
+        static void getLastYearData() {
+        Account testAccount = [SELECT Id FROM Account WHERE Name='Test Account' LIMIT 1];
+      
+        Test.startTest();
+        List<Invoice_Lines__c> resultLastYear = SalesDataTable.getLastYearData(testAccount.Id);
+        System.debug('resultLastYear@@@@@@' +resultLastYear.size());  
+        System.debug('resultLastYearQuantity@@@@@@' +resultLastYear[0].Quantity__c); 
+        System.debug('resultLastYearQuantity2@@@@@@' +resultLastYear[1].Quantity__c);    
+        Test.stopTest();
+      
+        // Verify that the result list contains the expected records
+        System.assertEquals(3, resultLastYear.size(), 'Incorrect result size');
+           
+        System.assertEquals(1057, resultLastYear[0].Quantity__c, 'Incorrect quantity in result');
+        System.assertEquals(35560, resultLastYear[0].Total_Product_Price__c, 'Incorrect total product price in result');
+        System.assertEquals('lb', resultLastYear[0].Quantity_Units__c, 'Incorrect Unit in res');      
+      
+        System.assertEquals(1410, resultLastYear[1].Quantity__c, 'Incorrect quantity in result');
+        System.assertEquals(11985, resultLastYear[1].Total_Product_Price__c, 'Incorrect total product price in result');
+        System.assertEquals('lb', resultLastYear[1].Quantity_Units__c, 'Incorrect Unit in res');    
+    
+    }
+    
+    
+        @isTest     
+        static void getLastToLastYearData() {
+        Account testAccount = [SELECT Id FROM Account WHERE Name='Test Account' LIMIT 1];
+
+        Test.startTest();
+        List<Invoice_Lines__c> resultLastToLastYear = SalesDataTable.getLastToLastYearData(testAccount.Id);
+        System.debug('resultLastToLastYear@@@@@@' +resultLastToLastYear.size()); 
+        Test.stopTest();
+        
+        // Verify that the result list contains the expected records
+        System.assertEquals(2, resultLastToLastYear.size(), 'Incorrect result size');       
+        System.assertEquals(5, resultLastToLastYear[0].Quantity__c, 'Incorrect quantity in result');   
+           
+        } 
+    
+            
+    @isTest
+        static void getProdID() {
+        Account testAccount = [SELECT Id FROM Account WHERE Name='Test Account' LIMIT 1];
+      
+        Test.startTest();
+        List<Invoice_Lines__c> resultProdID = SalesDataTable.getProdID(testAccount.Id);
+        System.debug('resultProdID' +resultProdID.size());    
+        Test.stopTest();            
+        System.assertEquals(4, resultProdID.size(), 'Incorrect result size');    
+      
+}
+     
+
+}

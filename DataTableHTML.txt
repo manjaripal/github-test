@@ -1,0 +1,164 @@
+SalesDataTable.html
+
+<template> 
+    <!--adding code --> 
+    <template if:true={data}>  
+    <table class="table table-condensed table-striped table-hover" style="width: 100%; margin-left: auto; margin-right: auto;" border="2" cellspacing="1" cellpadding="1" align="center">
+       <thead>
+           <tr> 
+             <th style="width: 50px; background-color: #e3e0e0ea; text-align: center; white-space: nowrap;">S.No</th>
+             <th style="width: 100px; background-color: #e3e0e0ea; text-align: center; white-space: nowrap;">Prod Name</th>
+             <th style="width: 100px; background-color: #e3e0e0ea; text-align: center; white-space: nowrap;">QTY (2021)</th>
+             <th style="width: 100px; background-color: #e3e0e0ea; text-align: center; white-space: nowrap;">QTY (2022)</th>
+             <th style="width: 50px; background-color: #e3e0e0ea; text-align: center; white-space: nowrap;">U/M </th>
+
+             <th style="width: 30px; background-color: #c6c2c2df;"></th>
+
+             <th style="width: 100px; background-color: #e3e0e0ea; text-align: center; white-space: nowrap;">QTY (2022YTD)</th>
+             <th style="width: 50px; background-color: #e3e0e0ea; text-align: center; white-space: nowrap;">U/M </th>
+             <th style="width: 100px; background-color: #e3e0e0ea; text-align: center; white-space: nowrap;">AMT (2022YTD)</th>
+
+             <th style="width: 30px; background-color: #c6c2c2df;"></th>
+
+             <th style="width: 100px; background-color: #e3e0e0ea; text-align: center; white-space: nowrap;">QTY (2023YTD)</th>
+             <th style="width: 50px; background-color: #e3e0e0ea; text-align: center; white-space: nowrap;">U/M </th>
+             <th style="width: 100px; background-color: #e3e0e0ea; text-align: center; white-space: nowrap;">AMT (2023YTD)</th>
+
+             <th style="width: 30px; background-color: #c6c2c2df;"></th>
+
+             <th style="width: 100px; background-color: #e3e0e0ea; text-align: center; white-space: nowrap;">Diff.(QTY)</th>
+             <th style="width: 100px; background-color: #e3e0e0ea; text-align: center; white-space: nowrap;">Diff.(AMT)</th>
+             <th style="width: 100px; background-color: #e3e0e0ea; text-align: center; white-space: nowrap;">Diff.(%)</th>
+           </tr>
+         </thead>
+   <tbody> 
+           <template for:each={pagedData} for:item="item" for:index="index">
+           <tr style="text-align: center; white-space: nowrap;" key={item.product}>
+            
+               <td style="text-align: center; white-space: nowrap;">{item.sNo}</td>                
+               <td style="text-align: center; white-space: nowrap;">{item.productName}</td> 
+               <td style="text-align: center; white-space: nowrap;">{item.lasttoLastYearQuantity}</td>
+               <td style="text-align: center; white-space: nowrap;">{item.lastYearQuantity}</td>
+               <td style="text-align: center; white-space: nowrap;">{item.qtyUnitsLastYear}</td>
+
+               <td style="width: 30px; background-color: #c6c2c2df;; text-align: center; white-space: nowrap;"></td> 
+  
+               <td style="text-align: center; white-space: nowrap;">{item.lastYearToDateQuantity}</td>
+               <td style="text-align: center; white-space: nowrap;">{item.qtyUnitsLastYearTodate}</td>
+                             
+              <!-- <td style="text-align: center; white-space: nowrap;">
+                   <template if:true={item.lastYearAmount}>
+                       ${item.lastYearAmount}
+                   </template>
+                   <template if:false={item.lastYearAmount}>
+                       0
+                   </template>
+               </td>      -->
+               
+               <td style="text-align: center; white-space: nowrap;">
+                <template if:true={item.lastYearTodateAmount}>
+                    ${item.lastYearTodateAmount}
+                </template>
+                <template if:false={item.lastYearTodateAmount}>
+                    0
+                </template>
+            </td>               
+
+            <td style="width: 30px; background-color: #c6c2c2df; text-align: center; white-space: nowrap;"></td> 
+ 
+               <td style="text-align: center; white-space: nowrap;">{item.currentYearQuantity}</td>
+               <td style="text-align: center; white-space: nowrap;">{item.qtyUnitsCurrentYear}</td>               
+               <td style="text-align: center; white-space: nowrap;">
+                   <template if:true={item.currentYearAmount}>
+                       ${item.currentYearAmount}
+                   </template>
+                   <template if:false={item.currentYearAmount}>
+                       0
+                   </template>
+               </td> 
+             
+            <td style="width: 30px; background-color: #c6c2c2df; text-align: center; white-space: nowrap;"></td> 
+
+               <td style="text-align: center; white-space: nowrap;">
+                <template if:true={item.qtyDifference}>
+                    {item.qtyDifference}
+                </template>
+                <template if:false={item.qtyDifference}>
+                    0
+                </template>
+            </td>  
+            <td style="text-align: center; white-space: nowrap;">
+               <template if:true={item.amtDifference}>
+                   ${item.amtDifference}
+               </template>
+               <template if:false={item.amtDifference}>
+                   0
+               </template>
+           </td>  
+           <!--<td style="text-align: center; white-space: nowrap;">
+            <template if:true={item.qtyDifferencePercentage}>
+                {item.qtyDifferencePercentage}
+            </template>
+            <template if:false={item.qtyDifferencePercentage}>
+                0
+            </template>
+        </td>  -->
+        <td style="text-align: center; white-space: nowrap;">
+            <template if:true={item.amtDifferencePercentage}>
+                {item.amtDifferencePercentage} %
+            </template>
+            <template if:false={item.amtDifferencePercentage}>
+                0
+            </template>
+        </td>  
+           </tr>       
+       </template>
+   </tbody>
+</table>  
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<div class="pagination" style="text-align: center">   
+    <button class="page-link" disabled={disableFirstPage} onclick={handleFirstPageClick}>First Page</button>
+    <span style="margin: 0 10px;"></span>
+   <button class="page-link" disabled={disablePrevious} onclick={handlePreviousClick}>Previous</button>
+   <span style="margin: 0 10px;"></span>
+   <button class="page-link" disabled={disableNext} onclick={handleNextClick}>Next</button>
+   <span style="margin: 0 10px;"></span>
+   <button class="page-link" disabled={disableLastPage} onclick={handleLastPageClick}>Last Page</button>
+</div> 
+</div>
+</template>
+<!---adding new code below 9/20/23 -->
+
+<template if:true={error}>
+    <p>Error: {error.body.message}</p>
+    <!--  error message to the user -->
+</template>
+
+<!-- <template if:true={data && data.length === 1 && (data[0].Invoice_Product_Name__c ==='Data not available for this year')} >
+    <p>Data is not available for this year.</p>
+    
+</template>  -->
+
+<template if:true={data}>
+    <p>Data is available.</p>
+    <table> <!-- Your table code here --> </table>
+</template>
+<template if:false={data}>
+    <p>Data is not available.</p>
+</template>
+
+<template if:true={data.length == 1}>
+    <p>Data length is 1.</p>
+    <template if:true={data[0].Invoice_Product_Name__c == 'Data not available for this year'}>
+        <p>Data is for this year.</p>
+    </template>
+    <template if:false={data[0].Invoice_Product_Name__c == 'Data not available for this year'}>
+        <p>Data is not for this year.</p>
+    </template>
+</template>
+<template if:false={data.length != 1}>
+    <p>Data length is not 1.</p>
+</template>
+
+</template>
